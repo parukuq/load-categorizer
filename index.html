@@ -58,6 +58,11 @@
             margin-bottom: 10px;
             white-space: pre-wrap;
         }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
         #copyButton {
             padding: 10px 20px;
             background-color: #28a745;
@@ -67,8 +72,20 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+        #clearButton {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
         #copyButton:hover {
             background-color: #218838;
+        }
+        #clearButton:hover {
+            background-color: #c82333;
         }
         .instructions {
             margin-bottom: 20px;
@@ -95,6 +112,7 @@
                 <li>Paste your data in the input box below</li>
                 <li>Click on any category button to filter the loads</li>
                 <li>Use the copy button to copy the filtered results</li>
+                <li>Use clear button to reset all fields</li>
             </ol>
         </div>
         <div class="headers">
@@ -106,13 +124,17 @@
         <div class="count-display" id="countDisplay"></div>
         <textarea class="input-area" id="inputText" placeholder="Paste your data here..."></textarea>
         <div class="output-area" id="outputText"></div>
-        <button id="copyButton" onclick="copyOutput()">Copy Results</button>
+        <div class="button-group">
+            <button id="copyButton" onclick="copyOutput()">Copy Results</button>
+            <button id="clearButton" onclick="clearAll()">Clear All</button>
+        </div>
     </div>
 
     <script>
         function extractLaneData(text) {
             const lines = text.split('\n');
             const results = [];
+            let currentLane = '';
             
             for(let line of lines) {
                 if(line.includes('lane:')) {
@@ -121,6 +143,8 @@
                     laneData = laneData.replace(/\s*(HIGH|MEDIUM|LOW|CRITICAL)\s*$/i, '');
                     // Remove any remaining commas at the end
                     laneData = laneData.replace(/,\s*$/, '');
+                    // Split by commas and take only the lane part
+                    laneData = laneData.split(',')[0];
                     results.push(laneData);
                 }
             }
@@ -134,12 +158,17 @@
 
             switch(type) {
                 case 'BOX':
-                    filtered = lanes.filter(lane => lane.includes('PX') || lane.includes('PW'));
+                    filtered = lanes.filter(lane => 
+                        (lane.includes('PX') || lane.includes('PW')) && 
+                        !lane.includes('ITR') && 
+                        !lane.includes('VENDOR'));
                     break;
                 case '53FT':
                     filtered = lanes.filter(lane => 
-                        (lane.includes('GEG') || lane.includes('TPA') || lane.includes('BOI')) &&
-                        !lane.includes('ITR'));
+                        (lane.includes('GEG') || lane.includes('TPA') || lane.includes('BOI') || 
+                         lane.includes('STL') || lane.includes('FAT') || lane.includes('KRIC')) &&
+                        !lane.includes('ITR') &&
+                        !lane.includes('VENDOR'));
                     break;
                 case 'VENDOR':
                     filtered = lanes.filter(lane => lane.includes('VENDOR'));
@@ -163,6 +192,15 @@
             const output = document.getElementById('outputText').innerText;
             navigator.clipboard.writeText(output);
             alert('Copied to clipboard!');
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').innerText = '';
+            document.getElementById('countDisplay').innerText = '';
+            document.querySelectorAll('.header-button').forEach(button => {
+                button.classList.remove('active');
+            });
         }
     </script>
 </body>
