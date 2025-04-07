@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
     <title>Load Categorizer</title>
@@ -76,6 +76,14 @@
             background-color: #e9ecef;
             border-radius: 4px;
         }
+        .count-display {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -95,6 +103,7 @@
             <button class="header-button" onclick="filterLoads('VENDOR')">VENDOR LOAD</button>
             <button class="header-button" onclick="filterLoads('ITR')">ITR LOAD</button>
         </div>
+        <div class="count-display" id="countDisplay"></div>
         <textarea class="input-area" id="inputText" placeholder="Paste your data here..."></textarea>
         <div class="output-area" id="outputText"></div>
         <button id="copyButton" onclick="copyOutput()">Copy Results</button>
@@ -141,6 +150,7 @@
             }
 
             document.getElementById('outputText').innerText = filtered.join('\n');
+            document.getElementById('countDisplay').innerText = `Total ${type} Loads: ${filtered.length}`;
             
             // Update active button
             document.querySelectorAll('.header-button').forEach(button => {
