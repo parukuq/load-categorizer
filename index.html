@@ -1,45 +1,48 @@
- function filterLoads(type) {
-    const input = document.getElementById('inputText').value;
-    const lanes = extractLaneData(input);
-    let filtered = [];
+<script>
+    // ... (keep any existing code above this)
 
-    switch(type) {
-        case 'BOX':
-            filtered = lanes.filter(lane => {
-                // Match patterns containing PZ, PX, or PW followed by numbers
-                const boxPattern = /P[ZXW]\d+/;
-                return boxPattern.test(lane);
-            });
-            break;
-            
-        case '53FT':
-            filtered = lanes.filter(lane => {
-                // Pattern 1: [Letters/numbers]digits->[Letters/numbers]digits (e.g., JAX7->ACUR, HME9->MEM2)
-                const pattern1 = /[A-Z0-9]+\d+->[A-Z0-9]+/;
-                // Pattern 2: Contains SWA_US or similar facility codes
-                const pattern2 = /[A-Z]+\d+->[A-Z]+\d/;
-                return (pattern1.test(lane) || pattern2.test(lane)) && 
-                       !lane.includes('ITR') && 
-                       !lane.includes('VENDOR') && 
-                       !(/P[ZXW]\d+/.test(lane)); // Exclude box truck patterns
-            });
-            break;
-            
-        case 'VENDOR':
-            filtered = lanes.filter(lane => lane.includes('VENDOR'));
-            break;
-            
-        case 'ITR':
-            filtered = lanes.filter(lane => lane.includes('ITR'));
-            break;
+    function filterLoads(type) {
+        const input = document.getElementById('inputText').value;
+        const lanes = extractLaneData(input);
+        let filtered = [];
+
+        switch(type) {
+            case 'BOX':
+                filtered = lanes.filter(lane => {
+                    // Match patterns containing PZ, PX, or PW followed by numbers
+                    const boxPattern = /P[ZXW]\d+/;
+                    return boxPattern.test(lane);
+                });
+                break;
+            case '53FT':
+                filtered = lanes.filter(lane => {
+                    // Pattern 1: [Letters/numbers]digits->[Letters/numbers]digits (e.g., JAX7->ACUR, HME9->MEM2)
+                    const pattern1 = /[A-Z0-9]+\d+->[A-Z0-9]+/;
+                    // Pattern 2: Contains SWA_US or similar facility codes
+                    const pattern2 = /[A-Z]+\d+->[A-Z]+\d/;
+                    return (pattern1.test(lane) || pattern2.test(lane)) && 
+                           !lane.includes('ITR') && 
+                           !lane.includes('VENDOR') && 
+                           !(/P[ZXW]\d+/.test(lane)); // Exclude box truck patterns
+                });
+                break;
+            case 'VENDOR':
+                filtered = lanes.filter(lane => lane.includes('VENDOR'));
+                break;
+            case 'ITR':
+                filtered = lanes.filter(lane => lane.includes('ITR'));
+                break;
+        }
+
+        document.getElementById('outputText').innerText = filtered.join('\n');
+        document.getElementById('countDisplay').innerText = `Total ${type} Loads: ${filtered.length}`;
+        
+        // Update active button
+        document.querySelectorAll('.header-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        event.target.classList.add('active');
     }
 
-    document.getElementById('outputText').innerText = filtered.join('\n');
-    document.getElementById('countDisplay').innerText = `Total ${type} Loads: ${filtered.length}`;
-    
-    // Update active button
-    document.querySelectorAll('.header-button').forEach(button => {
-        button.classList.remove('active');
-    });
-    event.target.classList.add('active');
-}
+    // ... (keep any existing code below this)
+</script>
