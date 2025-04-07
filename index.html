@@ -6,23 +6,29 @@
     switch(type) {
         case 'BOX':
             filtered = lanes.filter(lane => {
-                // Match patterns like PX12345, PW12345, etc.
-                const pPattern = /P[A-Z][0-9]+/;
-                return pPattern.test(lane);
+                // Match patterns containing PZ, PX, or PW followed by numbers
+                const boxPattern = /P[ZXW]\d+/;
+                return boxPattern.test(lane);
             });
             break;
+            
         case '53FT':
             filtered = lanes.filter(lane => {
-                // Match patterns with 3 or more alphanumeric characters
-                // but exclude patterns starting with P followed by numbers
-                const alphaNumPattern = /[A-Z0-9]{3,}/;
-                const pPattern = /P[A-Z][0-9]+/;
-                return alphaNumPattern.test(lane) && !pPattern.test(lane) && !lane.includes('ITR') && !lane.includes('VENDOR');
+                // Pattern 1: [Letters/numbers]digits->[Letters/numbers]digits (e.g., JAX7->ACUR, HME9->MEM2)
+                const pattern1 = /[A-Z0-9]+\d+->[A-Z0-9]+/;
+                // Pattern 2: Contains SWA_US or similar facility codes
+                const pattern2 = /[A-Z]+\d+->[A-Z]+\d/;
+                return (pattern1.test(lane) || pattern2.test(lane)) && 
+                       !lane.includes('ITR') && 
+                       !lane.includes('VENDOR') && 
+                       !(/P[ZXW]\d+/.test(lane)); // Exclude box truck patterns
             });
             break;
+            
         case 'VENDOR':
             filtered = lanes.filter(lane => lane.includes('VENDOR'));
             break;
+            
         case 'ITR':
             filtered = lanes.filter(lane => lane.includes('ITR'));
             break;
