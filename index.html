@@ -159,21 +159,27 @@
             switch(type) {
                 case 'BOX':
     filtered = lanes.filter(lane => {
-        // Match Amazon warehouse codes (3 letters + number)
-        const warehousePattern = /^[A-Z]{3}\d+/;
+        // Match any of these patterns:
+        // 1. Amazon warehouse codes (3-4 letters + optional numbers)
+        // 2. DLA/DSF followed by numbers
+        // 3. Various facility types with numbers
+        const warehousePattern = /(^[A-Z]{3,4}\d*|^D[LSF]\w+|^[A-Z]+\d+)/;
         
-        // Match sequences containing numeric or PW codes
-        const sequencePattern = /(\d{7}|PW\d{5})/;
+        // Match sequences containing:
+        // - 7-digit numbers
+        // - PW/PX/PZ followed by numbers
+        // - Any alphanumeric combinations
+        const sequencePattern = /(\d{7}|P[WXZ]\d+|\w+\d+)/;
         
-        // Match city to city pattern
-        const routePattern = /.+->.+/;
+        // Match any route pattern with ->
+        const routePattern = /.*->.*|.*->.*/;
         
-        // Check if the lane contains all three patterns
         return warehousePattern.test(lane) && 
                sequencePattern.test(lane) && 
                routePattern.test(lane);
     });
     break;
+
 
                 case '53FT':
                     filtered = lanes.filter(lane => {
